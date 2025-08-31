@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, BookOpen, Sparkles, Trash2, Plus, User, LogOut } from "lucide-react";
+import { Loader2, BookOpen, Sparkles, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { FlashcardGrid } from "./FlashcardGrid";
@@ -374,73 +374,63 @@ export const FlashcardGenerator = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
-      {/* User Status Bar */}
-      <div className="flex justify-between items-center bg-card border rounded-lg p-4">
-        <div className="flex items-center gap-3">
-          {isAuthenticated ? (
-            <>
-              <User className="h-5 w-5 text-primary" />
-              <div>
-                <p className="font-medium">{user?.email}</p>
-                <p className="text-sm text-muted-foreground">
-                  {flashcards.length} flashcards saved
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <User className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="font-medium">Guest User</p>
-                <p className="text-sm text-muted-foreground">
-                  Sign in to save your flashcards
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-        
-        <div className="flex gap-2">
-          {isAuthenticated && flashcards.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={deleteAllFlashcards}
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear All
-            </Button>
-          )}
-          
-          {isAuthenticated ? (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleSignOut}
-              disabled={isAuthLoading}
-            >
-              {isAuthLoading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <LogOut className="h-4 w-4 mr-2" />
-              )}
-              Sign Out
-            </Button>
-          ) : (
-            <Button 
-              onClick={() => setShowAuthForm(true)}
-              variant="outline"
-              size="sm"
-            >
-              <User className="h-4 w-4 mr-2" />
-              Sign In
-            </Button>
-          )}
-        </div>
-      </div>
+      {/* Authentication Form - Above Generator */}
+      {!isAuthenticated && (
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle className="text-center">Sign In / Sign Up</CardTitle>
+            <CardDescription className="text-center">
+              Create an account to save your flashcards permanently
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your.email@example.com"
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Your password"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <Button
+                onClick={() => isSignUp ? handleSignUp(authEmail, authPassword) : handleSignIn(authEmail, authPassword)}
+                disabled={isAuthLoading}
+                className="flex-1"
+              >
+                {isAuthLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : null}
+                {isSignUp ? 'Sign Up' : 'Sign In'}
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => setIsSignUp(!isSignUp)}
+                disabled={isAuthLoading}
+              >
+                {isSignUp ? 'Sign In' : 'Sign Up'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Input Section */}
+      {/* Flashcard Generator */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -503,82 +493,34 @@ export const FlashcardGenerator = () => {
               </>
             )}
           </Button>
-
-          {!isAuthenticated && (
-            <div className="text-center space-y-4">
-              <p className="text-sm text-muted-foreground">
-                💡 Sign in to save your flashcards permanently
-              </p>
-              
-              {!showAuthForm ? (
-                <Button 
-                  onClick={() => setShowAuthForm(true)}
-                  variant="outline"
-                  size="sm"
-                >
-                  Sign In / Sign Up
-                </Button>
-              ) : (
-                <Card className="max-w-md mx-auto">
-                  <CardContent className="pt-6 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your.email@example.com"
-                        value={authEmail}
-                        onChange={(e) => setAuthEmail(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="password">Password</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Your password"
-                        value={authPassword}
-                        onChange={(e) => setAuthPassword(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => isSignUp ? handleSignUp(authEmail, authPassword) : handleSignIn(authEmail, authPassword)}
-                        disabled={isAuthLoading}
-                        className="flex-1"
-                      >
-                        {isAuthLoading ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : null}
-                        {isSignUp ? 'Sign Up' : 'Sign In'}
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsSignUp(!isSignUp)}
-                        disabled={isAuthLoading}
-                      >
-                        {isSignUp ? 'Sign In' : 'Sign Up'}
-                      </Button>
-                    </div>
-                    
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowAuthForm(false)}
-                      className="w-full"
-                    >
-                      Cancel
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          )}
         </CardContent>
       </Card>
+
+      {/* User Status and Controls */}
+      {isAuthenticated && (
+        <div className="flex justify-between items-center bg-card border rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="font-medium">{user?.email}</p>
+              <p className="text-sm text-muted-foreground">
+                {flashcards.length} flashcards saved
+              </p>
+            </div>
+          </div>
+          
+          {flashcards.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={deleteAllFlashcards}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear All
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* Loading State for Existing Flashcards */}
       {isLoadingExisting && (

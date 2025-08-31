@@ -1,8 +1,62 @@
-import { BookOpen, GraduationCap, Brain } from "lucide-react";
+import { BookOpen, GraduationCap, Brain, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export const StudyHeader = () => {
+interface StudyHeaderProps {
+  isAuthenticated: boolean;
+  user: any;
+  onShowAuthForm: () => void;
+  onSignOut: () => void;
+  isAuthLoading: boolean;
+}
+
+export const StudyHeader = ({ 
+  isAuthenticated, 
+  user, 
+  onShowAuthForm, 
+  onSignOut, 
+  isAuthLoading 
+}: StudyHeaderProps) => {
   return (
     <header className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 py-12 mb-8">
+      {/* Navigation Bar */}
+      <div className="container mx-auto px-6 mb-8">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-8 w-8 text-primary" />
+            <span className="text-xl font-bold text-primary">Study Mate</span>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <User className="h-4 w-4 text-primary" />
+                  <span className="font-medium">{user?.email}</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={onSignOut}
+                  disabled={isAuthLoading}
+                >
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                onClick={onShowAuthForm}
+                variant="outline"
+                size="sm"
+              >
+                <User className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Header Content */}
       <div className="container mx-auto px-6 text-center">
         <div className="flex justify-center items-center mb-6">
           <div className="relative">
