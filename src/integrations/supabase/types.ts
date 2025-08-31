@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      flashcards: {
+        Row: {
+          answer: string
+          created_at: string
+          difficulty: string | null
+          id: string
+          question: string
+          set_name: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          question: string
+          set_name?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          question?: string
+          set_name?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
