@@ -160,6 +160,43 @@ export const FlashcardGenerator = () => {
     }
   };
 
+  const deleteFlashcardSet = async (setName: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('flashcards')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('set_name', setName);
+
+      if (error) {
+        console.error('Error deleting flashcard set:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete flashcard set.",
+          variant: "destructive",
+        });
+      } else {
+        setFlashcards(prev => prev.filter(card => card.set_name !== setName));
+        toast({
+          title: "Set Deleted",
+          description: `"${setName}" has been removed.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting flashcard set:', error);
+    }
+  };
+
+  // Get unique set names for display
+  const getUniqueSets = () => {
+    const sets = new Set(flashcards.map(card => card.set_name));
+    return Array.from(sets);
+  };
+
+  const uniqueSets = getUniqueSets();
+
   const handleSignUp = async (email: string, password: string) => {
     if (!email || !password) {
       toast({
@@ -503,20 +540,20 @@ export const FlashcardGenerator = () => {
             <div>
               <p className="font-medium">{user?.email}</p>
               <p className="text-sm text-muted-foreground">
-                {flashcards.length} flashcards saved
+                {uniqueSets.length} flashcard sets saved
               </p>
             </div>
           </div>
           
-          {flashcards.length > 0 && (
+          {uniqueSets.length > 0 && (
             <Button
               variant="outline"
               size="sm"
-              onClick={deleteAllFlashcards}
+              onClick={() => deleteAllFlashcards()}
               className="text-destructive hover:text-destructive"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear All
+              Clear All Sets
             </Button>
           )}
         </div>
@@ -535,6 +572,7 @@ export const FlashcardGenerator = () => {
         <FlashcardGrid 
           flashcards={flashcards} 
           onDelete={deleteFlashcard}
+          onDeleteSet={deleteFlashcardSet}
           isAuthenticated={isAuthenticated}
         />
       )}

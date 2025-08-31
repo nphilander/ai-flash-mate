@@ -28,7 +28,7 @@ export const Footer = () => {
         
         <div className="mt-4 pt-4 border-t border-border">
           <p className="text-xs text-center text-muted-foreground">
-            © 2024 Study Mate. All rights reserved.
+            © 2025 Study Mate. All rights reserved.
           </p>
         </div>
       </div>
