@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RotateCcw, Trash2, Calendar } from "lucide-react";
 
 interface Flashcard {
   id?: string;
@@ -9,13 +10,16 @@ interface Flashcard {
   answer: string;
   difficulty: string;
   set_name: string;
+  created_at?: string;
 }
 
 interface FlashcardGridProps {
   flashcards: Flashcard[];
+  onDelete?: (flashcardId: string) => Promise<void>;
+  isAuthenticated?: boolean;
 }
 
-export const FlashcardGrid = ({ flashcards }: FlashcardGridProps) => {
+export const FlashcardGrid = ({ flashcards, onDelete, isAuthenticated }: FlashcardGridProps) => {
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
 
   const flipCard = (index: number) => {
@@ -30,6 +34,13 @@ export const FlashcardGrid = ({ flashcards }: FlashcardGridProps) => {
     });
   };
 
+  const handleDelete = async (e: React.MouseEvent, flashcardId: string) => {
+    e.stopPropagation(); // Prevent card flip
+    if (onDelete) {
+      await onDelete(flashcardId);
+    }
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'easy': return 'bg-green-500';
@@ -39,12 +50,17 @@ export const FlashcardGrid = ({ flashcards }: FlashcardGridProps) => {
     }
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString();
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Your Flashcard Set</h2>
+        <h2 className="text-2xl font-bold mb-2">Your Flashcard Collection</h2>
         <p className="text-muted-foreground">
-          Click any card to flip and see the answer • {flashcards.length} cards generated
+          Click any card to flip and see the answer • {flashcards.length} cards total
         </p>
       </div>
 
@@ -53,7 +69,7 @@ export const FlashcardGrid = ({ flashcards }: FlashcardGridProps) => {
           const isFlipped = flippedCards.has(index);
           return (
             <div
-              key={index}
+              key={flashcard.id || index}
               className="relative h-64 cursor-pointer group"
               onClick={() => flipCard(index)}
             >
@@ -67,7 +83,19 @@ export const FlashcardGrid = ({ flashcards }: FlashcardGridProps) => {
                       <Badge variant="secondary" className={`${getDifficultyColor(flashcard.difficulty)} text-white`}>
                         {flashcard.difficulty}
                       </Badge>
-                      <RotateCcw className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <div className="flex gap-1">
+                        {isAuthenticated && flashcard.id && onDelete && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => handleDelete(e, flashcard.id!)}
+                            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                        <RotateCcw className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
                     </div>
                     
                     <div className="flex-1 flex items-center justify-center text-center">
@@ -76,8 +104,14 @@ export const FlashcardGrid = ({ flashcards }: FlashcardGridProps) => {
                       </p>
                     </div>
                     
-                    <div className="text-center">
-                      <p className="text-xs text-muted-foreground">Click to reveal answer</p>
+                    <div className="flex justify-between items-center text-xs text-muted-foreground">
+                      <span>Click to reveal answer</span>
+                      {flashcard.created_at && (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(flashcard.created_at)}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -89,7 +123,19 @@ export const FlashcardGrid = ({ flashcards }: FlashcardGridProps) => {
                       <Badge variant="outline" className="border-accent text-accent-foreground">
                         Answer
                       </Badge>
-                      <RotateCcw className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex gap-1">
+                        {isAuthenticated && flashcard.id && onDelete && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => handleDelete(e, flashcard.id!)}
+                            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                        <RotateCcw className="h-4 w-4 text-muted-foreground" />
+                      </div>
                     </div>
                     
                     <div className="flex-1 flex items-center justify-center text-center">
@@ -98,8 +144,14 @@ export const FlashcardGrid = ({ flashcards }: FlashcardGridProps) => {
                       </p>
                     </div>
                     
-                    <div className="text-center">
-                      <p className="text-xs text-muted-foreground">Click to see question</p>
+                    <div className="flex justify-between items-center text-xs text-muted-foreground">
+                      <span>Click to see question</span>
+                      {flashcard.created_at && (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(flashcard.created_at)}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
