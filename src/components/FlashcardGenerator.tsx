@@ -4,10 +4,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, BookOpen, Sparkles, Plus, Trash2 } from "lucide-react";
+import { Loader2, BookOpen, Sparkles, Plus, Trash2, Crown, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { FlashcardGrid } from "./FlashcardGrid";
+import { CartModal } from "./CartModal";
+import { SubscriptionStatus } from "./SubscriptionStatus";
 
 interface Flashcard {
   id?: string;
@@ -16,6 +18,12 @@ interface Flashcard {
   difficulty: string;
   set_name: string;
   created_at?: string;
+}
+
+interface UserSubscription {
+  plan_type: 'free' | 'premium';
+  status: string;
+  current_period_end?: string;
 }
 
 export const FlashcardGenerator = () => {
@@ -31,7 +39,18 @@ export const FlashcardGenerator = () => {
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoadingExisting, setIsLoadingExisting] = useState(false);
+  const [userSubscription, setUserSubscription] = useState<UserSubscription>({ plan_type: 'free', status: 'active' });
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const { toast } = useToast();
+
+  // Plan limits
+  const PLAN_LIMITS = {
+    free: 50,
+    premium: -1 // Unlimited
+  };
+
+  const currentLimit = PLAN_LIMITS[userSubscription.plan_type];
+  const canCreateMore = userSubscription.plan_type === 'premium' || flashcards.length < currentLimit;
 
   // Simple authentication check
   useEffect(() => {
@@ -43,6 +62,7 @@ export const FlashcardGenerator = () => {
         
         if (session?.user) {
           await loadExistingFlashcards(session.user.id);
+          await loadUserSubscription(session.user.id);
         }
       } catch (error) {
         console.error('Error checking auth:', error);
@@ -58,10 +78,12 @@ export const FlashcardGenerator = () => {
       
       if (session?.user && event === 'SIGNED_IN') {
         loadExistingFlashcards(session.user.id);
+        loadUserSubscription(session.user.id);
       } else if (event === 'SIGNED_OUT') {
         setFlashcards([]);
         setStudyNotes("");
         setSetName("");
+        setUserSubscription({ plan_type: 'free', status: 'active' });
         toast({
           title: "Signed Out",
           description: "You have been successfully signed out.",
@@ -71,6 +93,51 @@ export const FlashcardGenerator = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const loadUserSubscription = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error('Error loading subscription:', error);
+      } else {
+        if (data && data.length > 0) {
+          setUserSubscription(data[0]);
+        } else {
+          // Create default free subscription
+          await createFreeSubscription(userId);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+    }
+  };
+
+  const createFreeSubscription = async (userId: string) => {
+    try {
+      const { error } = await supabase
+        .from('subscriptions')
+        .insert({
+          user_id: userId,
+          plan_type: 'free',
+          status: 'active'
+        });
+
+      if (error) {
+        console.error('Error creating free subscription:', error);
+      } else {
+        setUserSubscription({ plan_type: 'free', status: 'active' });
+      }
+    } catch (error) {
+      console.error('Error creating free subscription:', error);
+    }
+  };
 
   const loadExistingFlashcards = async (userId: string) => {
     if (isLoadingExisting) return;
@@ -313,6 +380,16 @@ export const FlashcardGenerator = () => {
     }
   };
 
+  const handleUpgradeSuccess = async () => {
+    if (user) {
+      await loadUserSubscription(user.id);
+      toast({
+        title: "Welcome to Premium!",
+        description: "You now have unlimited access to all features.",
+      });
+    }
+  };
+
   const generateFlashcards = async () => {
     if (!studyNotes.trim()) {
       toast({
@@ -329,6 +406,17 @@ export const FlashcardGenerator = () => {
         description: "Please provide a name for your flashcard set.",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Check if user can create more flashcards
+    if (!canCreateMore) {
+      toast({
+        title: "Limit Reached",
+        description: "You've reached your flashcard limit. Upgrade to Premium for unlimited flashcards!",
+        variant: "destructive",
+      });
+      setShowPaymentModal(true);
       return;
     }
 
@@ -467,15 +555,34 @@ export const FlashcardGenerator = () => {
         </Card>
       )}
 
+      {/* Subscription Status for Authenticated Users */}
+      {isAuthenticated && (
+        <SubscriptionStatus
+          userPlan={userSubscription.plan_type}
+          flashcardCount={flashcards.length}
+          flashcardLimit={currentLimit}
+          onUpgrade={() => setShowPaymentModal(true)}
+          onManageSubscription={() => setShowPaymentModal(true)}
+        />
+      )}
+
       {/* Flashcard Generator */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BookOpen className="h-6 w-6 text-primary" />
             AI Flashcard Generator
+            {userSubscription.plan_type === 'premium' && (
+              <Crown className="h-5 w-5 text-yellow-500" />
+            )}
           </CardTitle>
           <CardDescription>
             Paste your study notes and let AI create interactive flashcards for you
+            {!canCreateMore && (
+              <span className="block text-red-600 mt-1">
+                ⚠️ You've reached your limit. Upgrade to Premium for unlimited flashcards!
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -504,7 +611,7 @@ export const FlashcardGenerator = () => {
 
           <Button 
             onClick={generateFlashcards}
-            disabled={isGenerating || !studyNotes.trim() || !setName.trim()}
+            disabled={isGenerating || !studyNotes.trim() || !setName.trim() || !canCreateMore}
             className="w-full"
             size="lg"
           >
@@ -513,6 +620,11 @@ export const FlashcardGenerator = () => {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Generating Flashcards...
               </>
+                         ) : !canCreateMore ? (
+               <>
+                 <ShoppingCart className="mr-2 h-4 w-4" />
+                 Add to Cart to Generate More
+               </>
             ) : !studyNotes.trim() || !setName.trim() ? (
               <>
                 <Sparkles className="mr-2 h-4 w-4" />
@@ -576,6 +688,14 @@ export const FlashcardGenerator = () => {
           isAuthenticated={isAuthenticated}
         />
       )}
+
+      {/* Cart Modal */}
+      <CartModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onSuccess={handleUpgradeSuccess}
+        userEmail={user?.email || ''}
+      />
     </div>
   );
 };

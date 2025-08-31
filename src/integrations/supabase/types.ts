@@ -6,53 +6,162 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
-  }
+export interface Database {
   public: {
     Tables: {
       flashcards: {
         Row: {
-          answer: string
-          created_at: string
-          difficulty: string | null
           id: string
+          user_id: string
           question: string
-          set_name: string | null
+          answer: string
+          set_name: string
+          difficulty: string
+          created_at: string
           updated_at: string
-          user_id: string | null
         }
         Insert: {
-          answer: string
-          created_at?: string
-          difficulty?: string | null
           id?: string
+          user_id: string
           question: string
-          set_name?: string | null
+          answer: string
+          set_name?: string
+          difficulty?: string
+          created_at?: string
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
-          answer?: string
-          created_at?: string
-          difficulty?: string | null
           id?: string
+          user_id?: string
           question?: string
-          set_name?: string | null
+          answer?: string
+          set_name?: string
+          difficulty?: string
+          created_at?: string
           updated_at?: string
-          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          plan_type: 'free' | 'premium'
+          status: 'active' | 'cancelled' | 'expired'
+          intasend_subscription_id: string | null
+          current_period_start: string | null
+          current_period_end: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_type?: 'free' | 'premium'
+          status?: 'active' | 'cancelled' | 'expired'
+          intasend_subscription_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_type?: 'free' | 'premium'
+          status?: 'active' | 'cancelled' | 'expired'
+          intasend_subscription_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      payments: {
+        Row: {
+          id: string
+          user_id: string
+          subscription_id: string | null
+          intasend_payment_id: string | null
+          amount: number
+          currency: string
+          status: 'pending' | 'completed' | 'failed' | 'refunded'
+          payment_method: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          subscription_id?: string | null
+          intasend_payment_id?: string | null
+          amount: number
+          currency?: string
+          status?: 'pending' | 'completed' | 'failed' | 'refunded'
+          payment_method?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          subscription_id?: string | null
+          intasend_payment_id?: string | null
+          amount?: number
+          currency?: string
+          status?: 'pending' | 'completed' | 'failed' | 'refunded'
+          payment_method?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_plan: {
+        Args: {
+          user_uuid: string
+        }
+        Returns: string
+      }
+      can_create_flashcards: {
+        Args: {
+          user_uuid: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
