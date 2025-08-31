@@ -497,8 +497,8 @@ export const FlashcardGenerator = () => {
     }
   };
 
-  return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+     return (
+     <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
       {/* Authentication Form - Above Generator */}
       {!isAuthenticated && (
         <Card className="max-w-md mx-auto">
@@ -645,9 +645,9 @@ export const FlashcardGenerator = () => {
         </CardContent>
       </Card>
 
-      {/* User Status and Controls */}
-      {isAuthenticated && (
-        <div className="flex justify-between items-center bg-card border rounded-lg p-4">
+             {/* User Status and Controls */}
+       {isAuthenticated && (
+         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center bg-card border rounded-lg p-4">
           <div className="flex items-center gap-3">
             <div>
               <p className="font-medium">{user?.email}</p>

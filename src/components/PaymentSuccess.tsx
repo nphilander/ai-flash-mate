@@ -12,7 +12,7 @@ export const PaymentSuccess = ({ planName, amount, userEmail }: PaymentSuccessPr
   const isPremium = planName.toLowerCase().includes('premium');
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-2xl mx-auto p-4 sm:p-6">
       <div className="text-center mb-8">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Check className="h-10 w-10 text-green-600" />
@@ -37,26 +37,26 @@ export const PaymentSuccess = ({ planName, amount, userEmail }: PaymentSuccessPr
             Here are the details of your purchase
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="font-medium">Plan:</span>
-            <Badge variant={isPremium ? "default" : "secondary"}>
-              {planName}
-            </Badge>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="font-medium">Amount:</span>
-            <span className="text-lg font-bold">${amount}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="font-medium">Billing Email:</span>
-            <span className="text-sm text-muted-foreground">{userEmail}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="font-medium">Billing Cycle:</span>
-            <span className="text-sm text-muted-foreground">Monthly</span>
-          </div>
-        </CardContent>
+                 <CardContent className="space-y-3">
+           <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center">
+             <span className="font-medium">Plan:</span>
+             <Badge variant={isPremium ? "default" : "secondary"}>
+               {planName}
+             </Badge>
+           </div>
+           <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center">
+             <span className="font-medium">Amount:</span>
+             <span className="text-lg font-bold">${amount}</span>
+           </div>
+           <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center">
+             <span className="font-medium">Billing Email:</span>
+             <span className="text-sm text-muted-foreground break-all">{userEmail}</span>
+           </div>
+           <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center">
+             <span className="font-medium">Billing Cycle:</span>
+             <span className="text-sm text-muted-foreground">Monthly</span>
+           </div>
+         </CardContent>
       </Card>
 
       {isPremium && (

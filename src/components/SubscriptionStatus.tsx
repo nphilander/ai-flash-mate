@@ -25,30 +25,30 @@ export const SubscriptionStatus = ({
   return (
     <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {isPremium ? (
-              <Crown className="h-5 w-5 text-yellow-500" />
-            ) : (
-              <Zap className="h-5 w-5 text-blue-500" />
-            )}
-            <CardTitle className="text-lg">
-              {isPremium ? 'Premium Plan' : 'Free Plan'}
-            </CardTitle>
-            <Badge 
-              variant={isPremium ? "default" : "secondary"}
-              className={isPremium ? "bg-gradient-to-r from-yellow-400 to-orange-500" : ""}
-            >
-              {isPremium ? 'Premium' : 'Free'}
-            </Badge>
-          </div>
-          {!isPremium && (
-                         <Button onClick={onUpgrade} size="sm" className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600">
+                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+           <div className="flex items-center gap-2">
+             {isPremium ? (
+               <Crown className="h-5 w-5 text-yellow-500" />
+             ) : (
+               <Zap className="h-5 w-5 text-blue-500" />
+             )}
+             <CardTitle className="text-lg">
+               {isPremium ? 'Premium Plan' : 'Free Plan'}
+             </CardTitle>
+             <Badge 
+               variant={isPremium ? "default" : "secondary"}
+               className={isPremium ? "bg-gradient-to-r from-yellow-400 to-orange-500" : ""}
+             >
+               {isPremium ? 'Premium' : 'Free'}
+             </Badge>
+           </div>
+           {!isPremium && (
+             <Button onClick={onUpgrade} size="sm" className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 w-full sm:w-auto">
                <ShoppingCart className="h-4 w-4 mr-2" />
                Add to Cart
              </Button>
-          )}
-        </div>
+           )}
+         </div>
         <CardDescription>
           {isPremium 
             ? "You have unlimited access to all features" 
@@ -58,8 +58,8 @@ export const SubscriptionStatus = ({
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {/* Usage Stats */}
-        <div className="grid grid-cols-2 gap-4">
+                 {/* Usage Stats */}
+         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="text-center p-3 bg-background rounded-lg">
             <div className="text-2xl font-bold text-primary">
               {flashcardCount}
@@ -140,8 +140,8 @@ export const SubscriptionStatus = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 pt-2">
+                 {/* Action Buttons */}
+         <div className="flex flex-col gap-2 pt-2 sm:flex-row">
           {isPremium ? (
             <Button 
               variant="outline" 
@@ -156,7 +156,7 @@ export const SubscriptionStatus = ({
                          <Button 
                onClick={onUpgrade} 
                size="sm" 
-               className="flex-1 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600"
+               className="flex-1 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 w-full"
              >
                <ShoppingCart className="h-4 w-4 mr-2" />
                Add to Cart

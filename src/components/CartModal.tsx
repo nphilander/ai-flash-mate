@@ -225,7 +225,7 @@ export const CartModal = ({ isOpen, onClose, onSuccess, userEmail }: CartModalPr
         </DialogDescription>
       </DialogHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+             <div className="grid grid-cols-1 gap-4 mt-4 md:mt-6 md:grid-cols-2 md:gap-6">
         {plans.map((plan) => (
           <Card 
             key={plan.id}
@@ -242,25 +242,25 @@ export const CartModal = ({ isOpen, onClose, onSuccess, userEmail }: CartModalPr
               </Badge>
             )}
             
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  {plan.id === 'premium' ? (
-                    <Crown className="h-5 w-5 text-yellow-500" />
-                  ) : (
-                    <Zap className="h-5 w-5 text-blue-500" />
-                  )}
-                  {plan.name}
-                </CardTitle>
-                <div className="text-right">
-                  <div className="text-2xl font-bold">
-                    ${plan.price}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      /month
-                    </span>
-                  </div>
-                </div>
-              </div>
+                         <CardHeader>
+               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                 <CardTitle className="flex items-center gap-2">
+                   {plan.id === 'premium' ? (
+                     <Crown className="h-5 w-5 text-yellow-500" />
+                   ) : (
+                     <Zap className="h-5 w-5 text-blue-500" />
+                   )}
+                   {plan.name}
+                 </CardTitle>
+                 <div className="text-left sm:text-right">
+                   <div className="text-2xl font-bold">
+                     ${plan.price}
+                     <span className="text-sm font-normal text-muted-foreground">
+                       /month
+                     </span>
+                   </div>
+                 </div>
+               </div>
               <CardDescription>
                 {plan.flashcardLimit === -1 ? (
                   <span className="flex items-center gap-1">
@@ -287,7 +287,7 @@ export const CartModal = ({ isOpen, onClose, onSuccess, userEmail }: CartModalPr
         ))}
       </div>
 
-      <div className="flex gap-3 mt-6">
+             <div className="flex flex-col gap-3 mt-4 md:mt-6 md:flex-row">
         <Button variant="outline" onClick={handleClose} className="flex-1">
           Cancel
         </Button>
@@ -331,12 +331,12 @@ export const CartModal = ({ isOpen, onClose, onSuccess, userEmail }: CartModalPr
              <CardTitle className="text-lg">Order Summary</CardTitle>
            </CardHeader>
            <CardContent className="pt-0">
-             <div className="flex justify-between items-center">
+             <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
                <div>
                  <p className="font-medium">{selectedPlanData?.name} Plan</p>
                  <p className="text-sm text-muted-foreground">Monthly subscription</p>
                </div>
-               <div className="text-right">
+               <div className="text-left sm:text-right">
                  <p className="text-xl font-bold">${selectedPlanData?.price}</p>
                  <p className="text-sm text-muted-foreground">per month</p>
                </div>
@@ -370,7 +370,7 @@ export const CartModal = ({ isOpen, onClose, onSuccess, userEmail }: CartModalPr
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="expiryDate">Expiry Date</Label>
                 <Input
@@ -438,7 +438,7 @@ export const CartModal = ({ isOpen, onClose, onSuccess, userEmail }: CartModalPr
            </div>
          </div>
 
-         <div className="flex gap-3 pt-2">
+                   <div className="flex flex-col gap-3 pt-2 sm:flex-row">
            <Button variant="outline" onClick={handleClose} className="flex-1">
              Cancel
            </Button>
@@ -473,7 +473,7 @@ export const CartModal = ({ isOpen, onClose, onSuccess, userEmail }: CartModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
         {checkoutStep === 'cart' && renderCartStep()}
         {checkoutStep === 'payment' && renderPaymentStep()}
         {checkoutStep === 'processing' && renderProcessingStep()}
