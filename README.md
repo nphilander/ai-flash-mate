@@ -8,7 +8,7 @@
 
 > Transform your study notes into intelligent, interactive flashcards with AI in seconds. Built for students, by students.
 
-![AI FlashMate Demo]([https://via.placeholder.com/800x400/3B82F6/FFFFFF?text=AI+FlashMate+Demo+GIF](https://ai-flash-mate.netlify.app/))
+![AI FlashMate Demo](https://ai-flash-mate.netlify.app/)
 
 ## 🚀 Features
 
